@@ -9,11 +9,11 @@ client = discord.Client()
 @client.event
 async def on_message(message):
 
-    if message.author == client.user:
-        return
-
     if message.content.startswith('!paywall'):
-        msg = message.content.split(" ")[1]
-        await message.channel.send(message.channel, msg)
+        words = message.content.split(" ")
+        await message.channel.send(f"https://www.archive.is/{words[1]}")
+
+    if message.content.startswith('who is a horrible person?'):
+        await message.channel.send(f"Why, @Sal of course!")
 
 client.run(token)
