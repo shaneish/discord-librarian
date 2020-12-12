@@ -14,6 +14,6 @@ async def on_message(message):
 
     if message.content.startswith('!paywall'):
         msg = message.content.split(" ")[1]
-        await client.send_message(message.channel, msg)
+        await message.channel.send(message.channel, msg)
 
 client.run(token)
