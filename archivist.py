@@ -1,4 +1,5 @@
 import discord
+import asyncio
 
 with open("./token", "r") as file:
     token = file.read()
