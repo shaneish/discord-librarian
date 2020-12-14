@@ -77,15 +77,15 @@ async def on_message(message):
             await message.channel.send('**Added the following domains:**' + "\n\n" + format_list(new_paywalls))
 
     if message.content.startswith('!delete'):
-        # Add new domains to list of paywalled domains
+        # Delete domains to list of paywalled domains
         # Format: `!add DOMAIN_1 DOMAIN_2 ... DOMAIN_n` will add DOMAIN_1 thru DOMAIN_n to list
         #     of paywalled sites and respond with a confirmation message.
         new_paywalls = message.content.split(" ")[1:]
         paywalled_sites = [i for i in paywalled_sites if i not in new_paywalls]
-        with open('paywalled', 'w') as file:
+        with open('paywalled', 'w') as file:e
             sites = "\n".join(paywalled_sites)
             file.write(sites)
-            await message.channel.send('**Added the following domains:**' + "\n\n" + format_list(new_paywalls))
+            await message.channel.send('**Deleted the following domains:**' + "\n\n" + format_list(new_paywalls))
     
     if message.content.startswith("!list paywalls"):
         # Displays list of all sites on the current paywall list
