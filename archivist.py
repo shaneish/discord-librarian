@@ -48,7 +48,7 @@ async def on_message(message):
         '''
         await message.channel.send('No problemo buckaroo, anything for a fellow reptile.')
 
-    if message.content.startswith('who is a horrible person?'):
+    if ('who' in message.content.lower()) and ('horrible' in message.content.lower()):
         '''
         You know what this does
         '''
