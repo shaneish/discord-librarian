@@ -15,6 +15,15 @@ def url_validator(x):
     except:
         return False
 
+def format_list(l, n=3):
+    s = f"\t{str(l[0])}"
+    for ndx, site in enumerate(l[1:]):
+        if (ndx+1)%n == 0:
+            s += f"\n\t{site}"
+        else:
+            s += f"\t\t{site}"
+    return s
+
 # read the paywalled config file to read all websites currently redirected by TheLibrarian
 with open('paywalled', 'r') as file:
     paywalled_sites = file.read().split("\n")
@@ -58,15 +67,16 @@ async def on_message(message):
         # Format: `!add DOMAIN_1 DOMAIN_2 ... DOMAIN_n` will add DOMAIN_1 thru DOMAIN_n to list
         #     of paywalled sites and respond with a confirmation message.
         new_paywalls = message.content.split(" ")[1:]
-        paywalled_sites += new_paywalls 
-        with open('paywalled', 'a') as file:
-            sites = "\n" + "\n".join(new_paywalls)
+        paywalled_sites += new_paywalls
+        paywalled_sites = list(set(paywalled_sites))
+        with open('paywalled', 'w') as file:
+            sites = "\n".join(paywalled_sites)
             file.write(sites)
-            await message.channel.send('Added the following domains:' + sites)
+            await message.channel.send('Added the following domains:' + "\n\n" + format_list(new_paywalls))
     
     if message.content.startswith("!list paywalls"):
         # Displays list of all sites on the current paywall list
-        await message.channel.send("\n".join(sorted(paywalled_sites)))
+        await message.channel.send("Paywalled sites:" + "\n\n" + format_list(sorted(paywalled_sites)))
 
 if __name__ == "__main__":
     client.run(token)
