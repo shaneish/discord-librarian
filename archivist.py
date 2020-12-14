@@ -81,7 +81,7 @@ async def on_message(message):
         # Format: `!add DOMAIN_1 DOMAIN_2 ... DOMAIN_n` will add DOMAIN_1 thru DOMAIN_n to list
         #     of paywalled sites and respond with a confirmation message.
         new_paywalls = message.content.split(" ")[1:]
-        paywalled_sites = [i for i in paywalled_sites if i is not in new_paywalls]
+        paywalled_sites = [i for i in paywalled_sites if i not in new_paywalls]
         with open('paywalled', 'w') as file:
             sites = "\n".join(paywalled_sites)
             file.write(sites)
