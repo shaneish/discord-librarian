@@ -82,7 +82,7 @@ async def on_message(message):
         #     of paywalled sites and respond with a confirmation message.
         new_paywalls = message.content.split(" ")[1:]
         paywalled_sites = [i for i in paywalled_sites if i not in new_paywalls]
-        with open('paywalled', 'w') as file:e
+        with open('paywalled', 'w') as file:
             sites = "\n".join(paywalled_sites)
             file.write(sites)
             await message.channel.send('**Deleted the following domains:**' + "\n\n" + format_list(new_paywalls))
