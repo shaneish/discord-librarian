@@ -16,7 +16,7 @@ def url_validator(x):
         return False
 
 def format_list(l, n=3):
-    s = f"\t{str(l[0])}"
+    s = str(l[0])
     for ndx, site in enumerate(l[1:]):
         if (ndx+1)%n == 0:
             s += f"\n\t{site}"
@@ -72,11 +72,11 @@ async def on_message(message):
         with open('paywalled', 'w') as file:
             sites = "\n".join(paywalled_sites)
             file.write(sites)
-            await message.channel.send('Added the following domains:' + "\n\n" + format_list(new_paywalls))
+            await message.channel.send('Added the following domains:' + "\n\n\t" + format_list(new_paywalls))
     
     if message.content.startswith("!list paywalls"):
         # Displays list of all sites on the current paywall list
-        await message.channel.send("Paywalled sites:" + "\n\n" + format_list(sorted(paywalled_sites)))
+        await message.channel.send("Paywalled sites:" + "\n\n\t" + format_list(sorted(paywalled_sites)))
 
 if __name__ == "__main__":
     client.run(token)
