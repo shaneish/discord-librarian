@@ -41,7 +41,7 @@ async def on_message(message):
         # You know what this does
         await message.channel.send(f"AJ is the real commie here!")
     
-    if or_includes(message.content, 'shane', 'metricity', 'the best'):
+    if or_includes(message.content, 'shane', 'metricity', 'the best')  and (message.author != client.user):
         await message.channel.send(f"Shane really is the best.")
     
     if or_includes(message.content, "suck", "sux") and (message.author != client.user):
