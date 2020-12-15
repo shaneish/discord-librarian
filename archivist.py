@@ -1,8 +1,11 @@
 import discord
 import asyncio
 import tldextract
+import requests
+import json
 from urllib.parse import urlparse
 from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes
+import random
 
 # load paywalled sites
 paywalled_sites = load_paywalls()
@@ -71,6 +74,33 @@ async def on_message(message):
     if message.content.startswith("!list paywalls"):
         # Displays list of all sites on the current paywall list
         await message.channel.send("**Paywalled sites:**" + "\n" + cprint(sorted(paywalled_sites)))
+        
+    if message.content.startswith("!gif"):
+        scope = 1
+        melee = False
+        num_gifs = 1
+        parsed = message.content.split(" ")
+        if parsed[1] == 'melee':
+            melee = True
+            search = "+".join(parsed[2:])
+        else:
+            search = "+".join(parsed[1:])
+        try:
+            scope_str = parsed[0][4:]
+            scope = int(scope_str)
+            if melee:
+                num_gifs = scope
+        except:
+            pass
+        choice = random.randint(1, scope)
+        response = requests.get(f"https://api.giphy.com/v1/gifs/search?q={search}&api_key=WiLstLIo2SInusTmGDDkhhY0tU6xKNEl&limit={num_gifs}&offset={choice}")
+        if response.status_code != 200:
+            await message.channel.send("U stupid bruh, bad request.")
+        else:
+            gifs = response.json()['data']
+            gif_urls = [gif['url'] for gif in gifs]
+            for url in gif_urls:
+                await message.channel.send(url)
 
 if __name__ == "__main__":
     client.run(token)
