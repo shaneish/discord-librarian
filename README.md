@@ -10,10 +10,18 @@ Currently hosted on a RPi Zero plugged in at my house.  Initial plan was to host
 
 Posting any website currently on the list of paywalled sites will automatically cause the bot to respond with an archive.is link.  If the site isn't currently on the paywalled list, you can use the command `!paywall site`
 
+![Posting article](./pictures/translate.png)
+
 To add to the list of paywalled sites, simply type `!add domain` to add that domain.
+
+![Add domain](./pictures/add.png)
 
 To delete from the list, use `!delete domain`.
 
+![Delete domain](./pictures/delete.png)
+
 To show a list of all paywalled sites, use `!list paywalls`
+
+![List paywalls](./pictures/list.png)
 
 Additionally, there are quite a few easter eggs thrown in for the lulz that aren't related to getting around paywalls.
