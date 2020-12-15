@@ -55,7 +55,7 @@ async def on_message(message):
         with open('paywalled', 'w') as file:
             sites = "\n".join(paywalled_sites)
             file.write(sites)
-            await message.channel.send('**Added the following domains:**' + "\n" + cprint(new_paywalls, sep=" - "))
+            await message.channel.send('**Added the following domains:**' + "\n" + cprint(new_paywalls))
 
     if message.content.startswith('!delete'):
         # Delete domains to list of paywalled domains
@@ -66,11 +66,11 @@ async def on_message(message):
         with open('paywalled', 'w') as file:
             sites = "\n".join(paywalled_sites)
             file.write(sites)
-            await message.channel.send('**Deleted the following domains:**' + "\n" + cprint(new_paywalls, sep=" - "))
+            await message.channel.send('**Deleted the following domains:**' + "\n" + cprint(new_paywalls))
     
     if message.content.startswith("!list paywalls"):
         # Displays list of all sites on the current paywall list
-        await message.channel.send("**Paywalled sites:**" + "\n" + cprint(sorted(paywalled_sites), sep=" - "))
+        await message.channel.send("**Paywalled sites:**" + "\n" + cprint(sorted(paywalled_sites)))
 
 if __name__ == "__main__":
     client.run(token)

@@ -22,18 +22,15 @@ def cprint(string_list, cols=3, sep="   "):
     
     Returns: [Str]
     '''
-    # max_length = columnize(string_list, cols=cols)
-    s = str(string_list[0])
-    # s = str(string_list[0]).ljust(max_length[0])
+    max_length = columnize(string_list, cols=cols)
+    s = f"```{str(string_list[0]).ljust(max_length[0])}"
     for ndx, site in enumerate(string_list[1:]):
         column = (ndx + 1) % cols
         if column == 0:
-            s += f"\n{site}"
-            # s += f"\n{site.ljust(max_length[0]}"
+            s += f"\n{site.ljust(max_length[0])}"
         else:
-            s += f"{sep}{site}"
-            # s += f"{space}{site.ljust(max_length[column]}"
-    return s
+            s += f"{sep}{site.ljust(max_length[column])}"
+    return s + "```"
 
 
 def url_validator(x):
