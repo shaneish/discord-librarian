@@ -10,7 +10,7 @@ def columnize(l, cols=3):
             tracker[ndx % cols] = cur_s
     return tracker
 
-def cprint(string_list, cols=4, sep="   "):
+def cprint(string_list, cols=3, sep="   "):
     '''
     Function to print long lists more compactly.
     Uncomment the comments to have it print perfect columns in terminal.
