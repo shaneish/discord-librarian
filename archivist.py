@@ -80,12 +80,11 @@ async def on_message(message):
         melee = False
         num_gifs = 1
         parsed = message.content.split(" ")
-        stripped = [strip(word) for word in message.content.split(" ")[2:]]
         if parsed[1] == 'melee':
             melee = True
-            stripped = [strip(word) for word in message.content.split(" ")[2:]]
+            stripped = [strip(word) for word in parsed[2:]]
         else:
-            stripped = [strip(word) for word in message.content.split(" ")[1:]]
+            stripped = [strip(word) for word in parsed[1:]]
         search = "+".join(stripped)
         try:
             scope_str = parsed[0][4:]
