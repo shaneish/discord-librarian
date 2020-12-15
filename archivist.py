@@ -6,6 +6,7 @@ import json
 from urllib.parse import urlparse
 from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip
 import random
+from ast import literal_eval
 
 # load paywalled sites
 paywalled_sites = load_paywalls()
@@ -35,6 +36,13 @@ async def on_message(message):
     if and_includes(message.content, 'who', 'horrible'):
         # You know what this does
         await message.channel.send(f"Why, {message.author} of course!")
+
+    if or_includes(message.content, 'socialis', 'communis'):
+        # You know what this does
+        await message.channel.send(f"AJ is the real commie here!")
+    
+    if and_includes(message.content, 'shane', 'metricity', 'the best'):
+        await message.channel.send(f"Shane really is the best.")
     
     if or_includes(message.content, "suck", "sux") and (message.author != client.user):
         # ya know what this does too
@@ -102,6 +110,10 @@ async def on_message(message):
             gif_urls = [gif['url'] for gif in gifs]
             for url in gif_urls:
                 await message.channel.send(url)
+
+    if message.content.startswith("!calc"):
+        terms = " ".join(message.content.split(" ")[1:])
+        await message.channel.send(literal_eval(terms))
 
 if __name__ == "__main__":
     client.run(token)
