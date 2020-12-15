@@ -4,7 +4,7 @@
 
 Dis da meanest librarian ya ever saw'd.  Was meant to be a simple bot to translate paywalled articles to archive.is versions, but has taken on a life of it's own.
 
-Currently hosted on a RPi Zero plugged in at my house.  Initial plan was to host on AWS, but I realized I still had a Pi Zero chilling at home without a use and figured "why not."  Have some additional scripts set up to manage updates to the bot on the Pi (basically a janky CI/CD pipeline written entirely in Bash), may upload those here if needed.
+Currently lives on a RPi Zero in my janky basement.  Don't mess with me or I'll pull the plug.
 
 ### How to use
 
