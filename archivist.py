@@ -2,36 +2,13 @@ import discord
 import asyncio
 import tldextract
 from urllib.parse import urlparse
+from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes
 
-def url_validator(x):
-    '''
-    Quick function to validate if 'x' is a proper URL or not
+# load paywalled sites
+paywalled_sites = load_paywalls()
 
-    Returns: Boolean
-    '''
-    try:
-        result = urlparse(x)
-        return all([result.scheme, result.netloc, result.path])
-    except:
-        return False
-
-def format_list(l, n=3):
-    s = "\t" + str(l[0])
-    for ndx, site in enumerate(l[1:]):
-        if (ndx+1)%n == 0:
-            s += f"\n\t{site}"
-        else:
-            s += f"\t\t\t{site}"
-    return s
-
-# read the paywalled config file to read all websites currently redirected by TheLibrarian
-with open('paywalled', 'r') as file:
-    paywalled_sites = file.read().split("\n")
-    paywalled_sites = [i for i in paywalled_sites if i != ""]
-
-# read TheLibrarians Discord token
-with open("./token", "r") as file:
-    token = file.read()
+# load bot token
+token = load_token()
 
 # creates discord Client object
 client = discord.Client()
@@ -47,14 +24,18 @@ async def on_message(message):
         words = message.content.split(" ")
         await message.channel.send(f"https://www.archive.is/{words[1]}")
 
-    if ('thank' in message.content.lower()) and ('soros' in message.content.lower()):
+    if and_includes(message.content, 'thank', 'soros'):
         # Responds to Sal when he says 'Thanks Soros'
         # (note: not antisemitic joke, used to mock the antisemitic globalist Soros stories)
         await message.channel.send('No problemo buckaroo, anything for a fellow reptile.')
-
-    if ('who' in message.content.lower()) and ('horrible' in message.content.lower()):
+    
+    if and_includes(message.content, 'who', 'horrible'):
         # You know what this does
         await message.channel.send(f"Why, {message.author} of course!")
+    
+    if or_includes(message.content, "suck", "sux") and (message.author != client.user):
+        # ya know what this does too
+        await message.channel.send("You know what else sucks? Salex Bexman.")
 
     if url_validator(message.content):
         # Checks if message is a valid URL and a paywalled domain.  If it is, returns the archive.is link.
@@ -74,7 +55,7 @@ async def on_message(message):
         with open('paywalled', 'w') as file:
             sites = "\n".join(paywalled_sites)
             file.write(sites)
-            await message.channel.send('**Added the following domains:**' + "\n\n" + format_list(new_paywalls))
+            await message.channel.send('**Added the following domains:**' + "\n" + cprint(new_paywalls, sep=" - "))
 
     if message.content.startswith('!delete'):
         # Delete domains to list of paywalled domains
@@ -85,11 +66,11 @@ async def on_message(message):
         with open('paywalled', 'w') as file:
             sites = "\n".join(paywalled_sites)
             file.write(sites)
-            await message.channel.send('**Deleted the following domains:**' + "\n\n" + format_list(new_paywalls))
+            await message.channel.send('**Deleted the following domains:**' + "\n" + cprint(new_paywalls, sep=" - "))
     
     if message.content.startswith("!list paywalls"):
         # Displays list of all sites on the current paywall list
-        await message.channel.send("**Paywalled sites:**" + "\n\n" + format_list(sorted(paywalled_sites)))
+        await message.channel.send("**Paywalled sites:**" + "\n" + cprint(sorted(paywalled_sites), sep=" - "))
 
 if __name__ == "__main__":
     client.run(token)
