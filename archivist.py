@@ -4,7 +4,7 @@ import tldextract
 import requests
 import json
 from urllib.parse import urlparse
-from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes
+from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip
 import random
 
 # load paywalled sites
@@ -80,11 +80,13 @@ async def on_message(message):
         melee = False
         num_gifs = 1
         parsed = message.content.split(" ")
+        stripped = [strip(word) for word in message.content.split(" ")[2:]]
         if parsed[1] == 'melee':
             melee = True
-            search = "+".join(parsed[2:])
+            stripped = [strip(word) for word in message.content.split(" ")[2:]]
         else:
-            search = "+".join(parsed[1:])
+            stripped = [strip(word) for word in message.content.split(" ")[1:]]
+        search = "+".join(stripped)
         try:
             scope_str = parsed[0][4:]
             scope = int(scope_str)

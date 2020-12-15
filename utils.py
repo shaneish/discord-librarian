@@ -64,3 +64,7 @@ def and_includes(message, *words):
 # quick way to identify 'or' word combinations
 def or_includes(message, *words):
     return max([(word.lower() in message.lower()) for word in words])
+
+# strip punctuation from a string
+def strip(s):
+    return "".join([char for char in s if char not in '~`!@#$%^&*()-_+=[]{};:"\'<>,./?'])
