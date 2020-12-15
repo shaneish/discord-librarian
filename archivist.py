@@ -1,4 +1,4 @@
-import discord
+from discord import *
 import asyncio
 import tldextract
 import requests
@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip
 import random
 from ast import literal_eval
+from datetime import datetime, timedelta
 
 # load paywalled sites
 paywalled_sites = load_paywalls()
@@ -19,8 +20,42 @@ client = discord.Client()
 
 # all responses triggered by a message are thrown in here
 @client.event
-async def on_message(message):
+async def on_message(message: Message):
+    
+    
+
     global paywalled_sites # include list of paywalled site inside this function
+    global last_check_in
+    
+
+    if message.channel is TextChannel:
+        #TODO: Put some random fuzz on the checkin timedelta
+        #TODO: Lower the checkin time delta based on the subsequent frequency
+        if not last_check_in or  last_check_in < (message.created_at - timedelta(seconds = 60))
+        #grab the bot ids
+        memb_ls=[m for m in message.channel.members if not m.bot()]
+        #grab the last ten minutes of messages, up to 200 messages
+        ten_min_ago = message.created_at - timedelta(seconds = 600)
+        messages = await message.channel.history(limit = 600, after = ten_min_ago).flatten()
+        #get the history of message authors who aren't bots
+        human_authors_history = [m.author for m in messages if m in memb_ls] #hopefully member objects are singleton across calls, else rework on ids
+        #get the unique authors
+        human_author_set = set(human_authors)
+        if len(human_author_set) == 2:
+            prefix = f"{human_author_set[0]} and {human_author_set[1]} are "
+        elif len(human_author_set) == 1:
+            prefix = f"{human_author_set[0]} is "
+
+        if len(messages) > 100:
+            await message.channel.send(prefix + "are going at it. Wow!")
+        if len(messages) > 200:
+            await message.channel.send(prefix + "are getting into some serious behavior.")
+        if len(messages) > 400:
+            await message.channel.send(prefix + "are setting a record!")
+        if len(messages) > 500:
+            await message.channel.send(prefix + " are very serious about this!")
+        if len(messages) == 600:
+            await message.channel.send(prefix + ", shut up. Please.")
 
     if message.content.startswith('!paywall'):
         # Manually link to archive.is
@@ -84,36 +119,38 @@ async def on_message(message):
         await message.channel.send("**Paywalled sites:**" + "\n" + cprint(sorted(paywalled_sites)))
         
     if message.content.startswith("!gif"):
-        scope = 1
-        melee = False
-        num_gifs = 1
-        parsed = message.content.split(" ")
-        if parsed[1] == 'melee':
-            melee = True
-            stripped = [strip(word) for word in parsed[2:]]
-        else:
-            stripped = [strip(word) for word in parsed[1:]]
-        search = "+".join(stripped)
-        try:
-            scope_str = parsed[0][4:]
-            scope = int(scope_str)
-            if melee:
-                num_gifs = scope
-        except:
-            pass
-        choice = random.randint(1, scope)
-        response = requests.get(f"https://api.giphy.com/v1/gifs/search?q={search}&api_key=WiLstLIo2SInusTmGDDkhhY0tU6xKNEl&limit={num_gifs}&offset={choice}")
-        if response.status_code != 200:
-            await message.channel.send("U stupid bruh, bad request.")
-        else:
-            gifs = response.json()['data']
-            gif_urls = [gif['url'] for gif in gifs]
-            for url in gif_urls:
-                await message.channel.send(url)
+        async with message.channel.typing(): #makes the channel say the bot is typing
+            scope = 1
+            melee = False
+            num_gifs = 1
+            parsed = message.content.split(" ")
+            if parsed[1] == 'melee':
+                melee = True
+                stripped = [strip(word) for word in parsed[2:]]
+            else:
+                stripped = [strip(word) for word in parsed[1:]]
+            search = "+".join(stripped)
+            try:
+                scope_str = parsed[0][4:]
+                scope = int(scope_str)
+                if melee:
+                    num_gifs = scope
+            except:
+                pass
+            choice = random.randint(1, scope)
+            response = requests.get(f"https://api.giphy.com/v1/gifs/search?q={search}&api_key=WiLstLIo2SInusTmGDDkhhY0tU6xKNEl&limit={num_gifs}&offset={choice}")
+            if response.status_code != 200:
+                await message.channel.send("U stupid bruh, bad request.")
+            else:
+                gifs = response.json()['data']
+                gif_urls = [gif['url'] for gif in gifs]
+                for url in gif_urls:
+                    await message.channel.send(url)
 
     if message.content.startswith("!calc"):
-        terms = " ".join(message.content.split(" ")[1:])
-        await message.channel.send(literal_eval(terms))
+        async with message.channel.typing(): #makes the channel say the bot is typing
+            terms = " ".join(message.content.split(" ")[1:])
+            await message.channel.send(literal_eval(terms))
 
 if __name__ == "__main__":
     client.run(token)
