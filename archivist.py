@@ -32,35 +32,41 @@ async def on_message(message: Message):
     global last_check_in
     
     #rate limiter
-    if message.content.startswith('!test'):
-        #TODO: Put some random fuzz on the checkin timedelta
-        #TODO: Lower the checkin time delta based on the subsequent frequency
-        if not last_check_in or  last_check_in < (message.created_at - timedelta(seconds = 60)):
-            #grab the bot ids
-            memb_ls=[m async for m in message.guild.fetch_members(limit=None) if not m.bot]
-            #grab the last ten minutes of messages, up to 200 messages
-            last_check_in = message.created_at
-            ten_min_ago = message.created_at - timedelta(seconds = 600)
-            messages = await message.channel.history(limit = 600, after = ten_min_ago).flatten()
-            #get the history of message authors who aren't bots
-            human_authors_history = [m.author for m in messages if m.author in memb_ls] #hopefully member objects are singleton across calls, else rework on ids
-            #get the unique authors
-            human_author_set = set(human_authors_history)
-            if len(human_author_set) == 2:
-                prefix = f"{list(human_author_set)[0].mention} and {list(human_author_set)[1].mention} are "
-            elif len(human_author_set) == 1:
-                prefix = f"{list(human_author_set)[0].mention} is "
-
-            if len(messages) > 100:
-                await message.channel.send(prefix + "going at it. Wow!")
-            if len(messages) > 200:
-                await message.channel.send(prefix + "getting into some serious behavior.")
-            if len(messages) > 300:
-                await message.channel.send(prefix + "setting a record!")
-            if len(messages) > 400:
-                await message.channel.send(prefix + "very serious about this!")
-            if len(messages) > 500:
-                await message.channel.send(prefix + ", shut up. Please.")
+    if message:
+        try:
+            #TODO: Put some random fuzz on the checkin timedelta
+            #TODO: Lower the checkin time delta based on the subsequent frequency
+            if not last_check_in or  last_check_in < (message.created_at - timedelta(seconds = 60)):
+                #grab the non-bot members
+                memb_ls=[m async for m in message.guild.fetch_members(limit=None) if not m.bot]
+                #grab the last ten minutes of messages, up to 600 messages
+                last_check_in = message.created_at
+                ten_min_ago = message.created_at - timedelta(seconds = 600)
+                messages = await message.channel.history(limit = 600, after = ten_min_ago).flatten()
+                #get the history of message authors who aren't bots
+                human_authors_history = [m.author for m in messages if m.author in memb_ls] 
+                #get the unique authors
+                human_author_set = set(human_authors_history)
+                #if two users are talking
+                prefix = None
+                if len(human_author_set) == 2:
+                    prefix = f"{list(human_author_set)[0].mention} and {list(human_author_set)[1].mention} are "
+                #if one user is talking to themself
+                elif len(human_author_set) == 1:
+                    prefix = f"{list(human_author_set)[0].mention} is "
+                if prefix:
+                    if len(messages) > 100:
+                        await message.channel.send(prefix + "going at it. Wow!")
+                    if len(messages) > 200:
+                        await message.channel.send(prefix + "getting into some serious behavior.")
+                    if len(messages) > 300:
+                        await message.channel.send(prefix + "setting a record!")
+                    if len(messages) > 400:
+                        await message.channel.send(prefix + "very serious about this!")
+                    if len(messages) > 500:
+                        await message.channel.send(prefix + ", shut up. Please.")
+        except:
+            pass
 
     if message.content.startswith('!paywall'):
         # Manually link to archive.is
