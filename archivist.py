@@ -35,31 +35,31 @@ async def on_message(message: Message):
     if message.content.startswith('!test'):
         #TODO: Put some random fuzz on the checkin timedelta
         #TODO: Lower the checkin time delta based on the subsequent frequency
-        if not last_check_in or  last_check_in < (message.created_at - timedelta(seconds = 1)):
+        if not last_check_in or  last_check_in < (message.created_at - timedelta(seconds = 60)):
             #grab the bot ids
-            memb_ls=[m for m in message.channel.members if not m.bot]
+            memb_ls=[m async for m in message.guild.fetch_members(limit=None) if not m.bot]
             #grab the last ten minutes of messages, up to 200 messages
             last_check_in = message.created_at
             ten_min_ago = message.created_at - timedelta(seconds = 600)
-            messages = await message.channel.history(limit = 600, after = ten_min_ago).flatten
+            messages = await message.channel.history(limit = 600, after = ten_min_ago).flatten()
             #get the history of message authors who aren't bots
-            human_authors_history = [m.author for m in messages if m in memb_ls] #hopefully member objects are singleton across calls, else rework on ids
+            human_authors_history = [m.author for m in messages if m.author in memb_ls] #hopefully member objects are singleton across calls, else rework on ids
             #get the unique authors
             human_author_set = set(human_authors_history)
             if len(human_author_set) == 2:
-                prefix = f"{list(human_author_set)[0]} and {list(human_author_set)[1]} are "
+                prefix = f"{list(human_author_set)[0].mention} and {list(human_author_set)[1].mention} are "
             elif len(human_author_set) == 1:
-                prefix = f"{list(human_author_set)[0]} is "
+                prefix = f"{list(human_author_set)[0].mention} is "
 
-            if len(messages) > 1:
-                await message.channel.send(prefix + "are going at it. Wow!")
-            if len(messages) > 2:
-                await message.channel.send(prefix + "are getting into some serious behavior.")
-            if len(messages) > 3:
-                await message.channel.send(prefix + "are setting a record!")
-            if len(messages) > 4:
-                await message.channel.send(prefix + " are very serious about this!")
-            if len(messages) == 5:
+            if len(messages) > 100:
+                await message.channel.send(prefix + "going at it. Wow!")
+            if len(messages) > 200:
+                await message.channel.send(prefix + "getting into some serious behavior.")
+            if len(messages) > 300:
+                await message.channel.send(prefix + "setting a record!")
+            if len(messages) > 400:
+                await message.channel.send(prefix + "very serious about this!")
+            if len(messages) > 500:
                 await message.channel.send(prefix + ", shut up. Please.")
 
     if message.content.startswith('!paywall'):
@@ -75,7 +75,7 @@ async def on_message(message: Message):
     
     if and_includes(message.content, 'who', 'horrible'):
         # You know what this does
-        await message.channel.send(f"Why, {message.author} of course!")
+        await message.channel.send(f"Why, {message.author.mention} of course!")
 
     if or_includes(message.content, 'socialis', 'communis'):
         # You know what this does
