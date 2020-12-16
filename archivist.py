@@ -122,6 +122,9 @@ async def on_message(message: Message):
     if message.content.startswith("!list paywalls"):
         # Displays list of all sites on the current paywall list
         await message.channel.send("**Paywalled sites:**" + "\n" + cprint(sorted(paywalled_sites)))
+    
+    if message.content.startswith("!test"):
+        await message.channel.send("Stop spamming the fucking chat with your damn tests u chode.")
         
     if message.content.startswith("!gif"):
         async with message.channel.typing(): #makes the channel say the bot is typing
@@ -155,7 +158,7 @@ async def on_message(message: Message):
     if message.content.startswith("!calc"):
         async with message.channel.typing(): #makes the channel say the bot is typing
             terms = " ".join(message.content.split(" ")[1:])
-            await message.channel.send(literal_eval(terms))
+            await message.channel.send(eval(terms))
 
 if __name__ == "__main__":
     client.run(token)
