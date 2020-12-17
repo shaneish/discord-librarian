@@ -10,14 +10,17 @@ import random
 from ast import literal_eval
 from datetime import datetime, timedelta
 
+
 # load paywalled sites
 paywalled_sites = load_paywalls()
 
 # load bot token
 token = load_token()
 
-# creates discord Client object
-client = discord.Client()
+# creates discord Client object (with member intents enabled to grab members)
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents = intents)
 
 #check last rate limiter check in time
 last_check_in = None
@@ -26,8 +29,6 @@ last_check_in = None
 @client.event
 async def on_message(message: Message):
     
-    
-
     global paywalled_sites # include list of paywalled site inside this function
     global last_check_in
     
@@ -38,7 +39,7 @@ async def on_message(message: Message):
             #TODO: Lower the checkin time delta based on the subsequent frequency
             if not last_check_in or  last_check_in < (message.created_at - timedelta(seconds = 60)):
                 #grab the non-bot members
-                memb_ls=[m async for m in message.guild.fetch_members(limit=None) if not m.bot]
+                memb_ls=[m for m in message.channel.members if not m.bot]
                 #grab the last ten minutes of messages, up to 600 messages
                 last_check_in = message.created_at
                 ten_min_ago = message.created_at - timedelta(seconds = 600)
