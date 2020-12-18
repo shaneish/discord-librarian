@@ -1,14 +1,10 @@
 import discord
-from discord import *
 from discord.ext import commands 
 import asyncio
 import tldextract
 import requests
-import json
-from urllib.parse import urlparse
 from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip
 import random
-from ast import literal_eval
 from datetime import datetime, timedelta
 
 
@@ -66,7 +62,7 @@ class RateLimiter(commands.Cog):
         self.last_check_in = None
 
     @commands.Cog.listener()
-    async def on_message(self, message: Message):
+    async def on_message(self, message: discord.Message):
         #TODO: Put some random fuzz on the checkin timedelta
         #TODO: Lower the checkin time delta based on the subsequent frequency
         if isinstance(message.channel, discord.channel.DMChannel) or isinstance(message.channel, discord.channel.GroupChannel):
@@ -137,6 +133,7 @@ class Utes(commands.Cog):
     @commands.command()
     async def gif(self, ctx, *args):
         await ctx.send(f'Implement me. {cprint(args)}')
+        
             # scope = 1
             # melee = False
             # num_gifs = 1
