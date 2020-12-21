@@ -129,34 +129,28 @@ class Utes(commands.Cog):
 
     @commands.command()
     async def gif(self, ctx, *args):
-        await ctx.send(f'Implement me. {cprint(args)}')
-        
-            # scope = 1
-            # melee = False
-            # num_gifs = 1
-            # parsed = message.content.split(" ")
-            # if parsed[1] == 'melee':
-            #     melee = True
-            #     stripped = [strip(word) for word in parsed[2:]]
-            # else:
-            #     stripped = [strip(word) for word in parsed[1:]]
-            # search = "+".join(stripped)
-            # try:
-            #     scope_str = parsed[0][4:]
-            #     scope = int(scope_str)
-            #     if melee:
-            #         num_gifs = scope
-            # except:
-            #     pass
-            # choice = random.randint(1, scope)
-            # response = requests.get(f"https://api.giphy.com/v1/gifs/search?q={search}&api_key=WiLstLIo2SInusTmGDDkhhY0tU6xKNEl&limit={num_gifs}&offset={choice}")
-            # if response.status_code != 200:
-            #     await message.channel.send("U stupid bruh, bad request.")
-            # else:
-            #     gifs = response.json()['data']
-            #     gif_urls = [gif['url'] for gif in gifs]
-            #     for url in gif_urls:
-            #           message.channel.send(url)
+        if args[0].isdigit():
+            scope = int(args[0])
+            args = args[1:]
+        else:
+            scope = 1
+
+        if args[0] == 'melee':
+            args = args[1:]
+            num_gifs = scope
+        else:
+            num_gifs = 1
+
+        search = "+".join(args)
+        choice = random.randint(1, scope)
+        response = requests.get(f"https://api.giphy.com/v1/gifs/search?q={search}&api_key=WiLstLIo2SInusTmGDDkhhY0tU6xKNEl&limit={num_gifs}&offset={choice}")
+        if response.status_code != 200:
+            await ctx.send("U stupid bruh, bad request.")
+        else:
+            gifs = response.json()['data']
+            gif_urls = [gif['url'] for gif in gifs]
+            for url in gif_urls:
+                await ctx.send(url)
 
     @commands.command()
     async def calc (self, ctx, *args):
