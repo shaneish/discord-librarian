@@ -129,18 +129,8 @@ class Utes(commands.Cog):
 
     @commands.command()
     async def gif(self, ctx, *args):
-        if args[0].isdigit():
-            scope = int(args[0])
-            args = args[1:]
-        else:
-            scope = 1
-
-        if args[0] == 'melee':
-            args = args[1:]
-            num_gifs = scope
-        else:
-            num_gifs = 1
-
+        scope, args = (int(args[0]), args[1:]) if args[0].isdigit() else (1, args)
+        num_gifs, args = (scope, args[1:]) if args[0] == 'melee' else (1, args)
         search = "+".join(args)
         choice = random.randint(1, scope)
         response = requests.get(f"https://api.giphy.com/v1/gifs/search?q={search}&api_key=WiLstLIo2SInusTmGDDkhhY0tU6xKNEl&limit={num_gifs}&offset={choice}")
