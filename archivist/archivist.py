@@ -11,8 +11,8 @@ from datetime import datetime, timedelta
 class Archivist(commands.Cog):
     def __init__(self, paywalled_sites):
         self.paywalled_sites = paywalled_sites
-    
-    @commands.command(name = 'paywalls')
+
+    @commands.command(name='paywalls')
     async def paywalls(self, ctx, *args):
         if args[0] == 'add':
             # Add new domains to list of paywalled domains
@@ -125,7 +125,7 @@ class Creeper(commands.Cog):
         await ctx.send("Stop spamming the fucking chat with your damn tests u chode.")
         
 class Utes(commands.Cog):
-
+    
 
     @commands.command()
     async def gif(self, ctx, *args):
