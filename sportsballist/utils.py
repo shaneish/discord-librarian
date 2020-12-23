@@ -101,7 +101,7 @@ def gen_leaderboard(name_map=nfl_map, teams=[]):
         try:
             teams = [team_finder(team_code(team, name_map)) for team in teams]
         except (AttributeError, HTTPError) as error:
-            return "**Contains an incorrect team name dummy."
+            return "**Contains an incorrect team name dummy**"
     else:
         teams = team_finder
     teams = [team.dataframe[['name', 'rank', 'wins', 'losses', 'win_percentage', 'games_played']] for team in teams]

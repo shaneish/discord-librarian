@@ -19,10 +19,14 @@ class Requests(commands.Cog):
         teams = " ".join(args).split("/")
         if (len(teams) > 0) and (teams[0] != ''):
             leaderboard = gen_leaderboard(name_map=nfl_map, teams=teams)
+            if type(leaderboard) == str:
+                await ctx.send(leaderboard)
             for chunk in split_df(leaderboard):
                 await ctx.send(cprint_df(chunk))
         else:
             leaderboard = gen_leaderboard(name_map=nfl_map, teams=nfl_map.keys())
+            if type(leaderboard) == str:
+                await ctx.send(leaderboard)
             for chunk in split_df(leaderboard):
                 await ctx.send(cprint_df(chunk))
 
