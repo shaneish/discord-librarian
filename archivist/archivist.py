@@ -119,6 +119,12 @@ class Creeper(commands.Cog):
         if or_includes(message.content, "suck", "sux") and (message.author != self.bot.user):
             # ya know what this does too
             await message.channel.send("You know what else sucks? Salex Bexman.")
+        
+        if 'twitter' in message.content.lower():
+            if 'metricity' in message.author.name.lower():
+                await message.channel.send(f"Another well-researched Shaun King tweet, {message.author.mention}?")
+            elif 'mudman' in message.author.name.lower():
+                await message.channel.send(f"Inta Hmar, {message.author.mention}.")
 
     @commands.command()
     async def test(self,ctx):
