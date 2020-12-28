@@ -78,6 +78,13 @@ def or_includes(message, *words):
 def strip(s):
     return "".join([char for char in s if char not in '~`!@#$%^&*()-_+=[]{};:"\'<>,./?'])
 
+def strip_word(word):
+    new_word = list()
+    for letter in word:
+        if letter not in "!@#$%^&*()=+[]}{|;:'\",<.>/?":
+            new_word.append(letter)
+    return "".join(new_word)
+
 class MalarkyDict:
 
     def __init__(self):
@@ -116,7 +123,18 @@ class MalarkyDict:
             self._keys = self._keys[:index] + [self._keys[index].union(new_key)] + self._keys[index+1:]
         else:
             raise ValueError("Cannot add to conflicting groups.")
-
+    
+    '''
+    def remove_from_group(self, single_key):
+        new_key = {single_key}
+        test_list = [bool(new_key.intersection(key)) for key in self._keys]
+        if sum(test_list) == 1:
+            index = test_list.index(True)
+            self._keys = self._keys[:index] + [self._keys[index].remove(single_key)] + self._keys[index+1:]
+        else:
+            raise ValueError("Not found in current groups.")
+    '''
+    
     def __len__(self):
         return len(self._keys)
     
@@ -151,7 +169,7 @@ class MalarkyDict:
         return self.__str__()
 
     def measure_malarky(self, sentence):
-        words = sentence.replace("\n", "").replace("\t", "").split(" ")
+        words = [strip_word(word) for word in sentence.replace("\n", "").replace("\t", "").replace("-", " ").replace("_", " ").split(" ")]
         groups_used = list()
         malarkey_count = 0
         for word in words:

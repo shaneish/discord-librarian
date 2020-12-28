@@ -84,6 +84,13 @@ class Archivist(commands.Cog):
                 await ctx.send(f"Added {set(args[2:])} to {args[1]}'s group.")
             except ValueError:
                 await ctx.send("Incompatible group addition, dummy.")
+        elif args[0] == "remove":
+            try:
+                self.malarky_dict.remove_from_group(args[1])
+                save_malarky(self.malarky_dict)
+                await ctx.send(f"Removed {args[1]} from group.")
+            except ValueError:
+                await ctx.send("Unable to remove from a group.")
 
     @commands.Cog.listener()
     async def on_message(self, message):
