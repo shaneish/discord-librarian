@@ -72,7 +72,7 @@ class Archivist(commands.Cog):
             elif malarkey_count < 800:
                 await ctx.send("**Extreme levels of Malarkey**")
             elif malarkey_count < 1000:
-                await ctx.send("**:rotating_light: Malarky Quarantine :rotating_light:**")
+                await ctx.send("**:rotating_light: Malarkey Quarantine :rotating_light:**")
             else:
                 await ctx.send("**:fire: :fire: GET OUTTA HERE, JACK! :fire: :fire:**")
         elif args[0] == "groups":
@@ -80,6 +80,7 @@ class Archivist(commands.Cog):
         elif args[0] == 'update':
             try:
                 self.malarky_dict._update_key(args[1:])
+                save_malarky(self.malarky_dict)
                 await ctx.send(f"Added {set(args[2:])} to {args[1]}'s group.")
             except ValueError:
                 await ctx.send("Incompatible group addition, dummy.")
