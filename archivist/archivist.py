@@ -3,14 +3,16 @@ from discord.ext import commands
 import asyncio
 import tldextract
 import requests
-from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip
+from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip, MalarkyDict, load_malarky, save_malarky
 import random
 from datetime import datetime, timedelta
+import pickle
 
 
 class Archivist(commands.Cog):
-    def __init__(self, paywalled_sites):
+    def __init__(self, paywalled_sites, malarky_dict):
         self.paywalled_sites = paywalled_sites
+        self.malarky_dict = malarky_dict
 
     @commands.command(name='paywalls')
     async def paywalls(self, ctx, *args):
@@ -43,6 +45,44 @@ class Archivist(commands.Cog):
                 await ctx.send(f"https://www.archive.is/{args[1]}")
             else:
                 await ctx.send(f"**{args[1]}** is an invalid url.")
+        
+    @commands.command(name="malarkey")
+    async def malarkey(self, ctx, *args):
+        if (len(args) > 1) and (args[0].isdigit()):
+            words = set(args[1:])
+            try:
+                self.malarky_dict[words] = int(args[0])
+                save_malarky(self.malarky_dict)
+                await ctx.send(f"New malarkey group {words} with value {int(args[0])} added!")
+            except ValueError:
+                await ctx.send("Incompatible malarkey addition, stupid.")
+        elif (len(args) == 0) or ((len(args) == 1) and (args[0] == "")):
+            malarkey_count = 0
+            for message in await ctx.channel.history(limit=1000, after=ctx.message.created_at - timedelta(minutes=30)).flatten():
+                if message.content:
+                    malarkey_count += self.malarky_dict.measure_malarky(message.content)
+            if malarkey_count < 1:
+                await ctx.send("**No Malarkey detected.**")
+            elif malarkey_count < 200:
+                await ctx.send("**Minimal Malarkey**")
+            elif malarkey_count < 400:
+                await ctx.send("**Potential Malarkey**")
+            elif malarkey_count < 600:
+                await ctx.send("**Significant Malarkey**")
+            elif malarkey_count < 800:
+                await ctx.send("**Extreme levels of Malarkey**")
+            elif malarkey_count < 1000:
+                await ctx.send("**:rotating_light: Malarky Quarantine :rotating_light:**")
+            else:
+                await ctx.send("**:fire: :fire: GET OUTTA HERE, JACK! :fire: :fire:**")
+        elif args[0] == "groups":
+            await ctx.send('```' + str(self.malarky_dict)[1:-1] + '```')
+        elif args[0] == 'update':
+            try:
+                self.malarky_dict._update_key(args[1:])
+                await ctx.send(f"Added {set(args[2:])} to {args[1]}'s group.")
+            except ValueError:
+                await ctx.send("Incompatible group addition, dummy.")
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -193,6 +233,8 @@ if __name__ == "__main__":
     paywalled_sites = load_paywalls()
     # load bot token
     token = load_token()
+    # load malarkydict
+    malarky = load_malarky()
 
     '''bot instantiation'''
     # creates discord bot object (with member intents enabled to grab members)
@@ -200,7 +242,7 @@ if __name__ == "__main__":
     intents.members = True
     bot = commands.Bot(intents = intents, command_prefix = '!', case_insensitive = True)
     #add command cogs to bot
-    bot.add_cog(Archivist(paywalled_sites)) #archive is commands and listener 
+    bot.add_cog(Archivist(paywalled_sites, malarky)) #archive is commands and listener 
     bot.add_cog(RateLimiter()) #gripe at sal and aj when they fight
     bot.add_cog(Utes()) #calc and gif
     bot.add_cog(Creeper(bot)) #listen to say weird things

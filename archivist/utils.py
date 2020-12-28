@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+import pickle
 
 def columnize(l, cols=3):
     tracker = dict()
@@ -57,6 +58,14 @@ def load_token(token_file='./token'):
         token = file.read()
         return token
 
+def load_malarky(malarkey_file='./malarky.pkl'):
+    with open(malarkey_file, 'rb') as file:
+        return pickle.load(file)
+
+def save_malarky(malarky_dict, malarky_file='./malarky.pkl'):
+    with open(malarky_file, 'wb') as file:
+        pickle.dump(malarky_dict, file)
+
 # quick way to identify 'and' word combinations
 def and_includes(message, *words):
     return all([(word.lower() in message.lower()) for word in words])
@@ -68,3 +77,85 @@ def or_includes(message, *words):
 # strip punctuation from a string
 def strip(s):
     return "".join([char for char in s if char not in '~`!@#$%^&*()-_+=[]{};:"\'<>,./?'])
+
+class MalarkyDict:
+
+    def __init__(self):
+        self._keys = list()
+        self._value_dict = dict()
+
+    def _get_index(self, keys):
+        keys = self._smooth_input(keys)
+        for key in self._keys:
+            if keys.issubset(key):
+                return self._keys.index(key)
+        return None
+
+    def _compatible_key(self, keys):
+        keys = self._smooth_input(keys)
+        compat_test = [bool(keys.intersection(key)) for key in self._keys]
+        if sum(compat_test) < 1:
+            return len(self._keys)
+        elif sum(compat_test) == 1:
+            return compat_test.index(True)
+
+    def _update_key(self, new_key):
+        new_key = self._smooth_input(new_key)
+        test_list = [bool(new_key.intersection(key)) for key in self._keys]
+        if sum(test_list) == 1:
+            index = test_list.index(True)
+            self._keys = self._keys[:index] + [self._keys[index].union(new_key)] + self._keys[index+1:]
+        elif sum(test_list) < 1:
+            self._keys.append(new_key)
+
+    def add_to_group(self, new_key):
+        new_key = self._smooth_input(new_key)
+        test_list = [bool(new_key.intersection(key)) for key in self._keys]
+        if sum(test_list) == 1:
+            index = test_list.index(True)
+            self._keys = self._keys[:index] + [self._keys[index].union(new_key)] + self._keys[index+1:]
+        else:
+            raise ValueError("Cannot add to conflicting groups.")
+
+    def __len__(self):
+        return len(self._keys)
+    
+    def _smooth_input(self, key_input):
+        if type(key_input) == str:
+            return {key_input.lower()}
+        else:
+            return {str(key).lower() for key in key_input}
+
+    def __setitem__(self, keys, value):
+        keys = self._smooth_input(keys)
+        value = float(value)
+        compat_index = self._compatible_key(keys)
+        if compat_index is not None:
+            self._update_key(keys)
+            self._value_dict[compat_index] = value
+        else:
+            raise ValueError("New key is incompatible with old.")
+
+    def __getitem__(self, key):
+        key = str(key)
+        index = self._get_index(key)
+        if index is None:
+            return 0
+        else:
+            return self._value_dict[index]
+    
+    def __str__(self):
+        return "{" + "\n".join([f"{key}: {self._value_dict[self._get_index(key)]}" for key in self._keys]) + "}"
+    
+    def __repr__(self):
+        return self.__str__()
+
+    def measure_malarky(self, sentence):
+        words = sentence.replace("\n", "").replace("\t", "").split(" ")
+        groups_used = list()
+        malarkey_count = 0
+        for word in words:
+            if self._get_index(word) not in groups_used:
+                malarkey_count += self.__getitem__(word)
+                groups_used.append(self._get_index(word))
+        return malarkey_count
