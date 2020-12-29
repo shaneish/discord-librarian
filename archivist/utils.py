@@ -59,13 +59,6 @@ def load_token(token_file='token'):
         token = file.read()
         return token
 
-def load_malarkey(malarkey_file='malarky.pkl'):
-    if path.exists(malarkey_file):
-        with open(malarkey_file, 'rb') as file:
-            return pickle.load(file)
-    else:
-        return MalarkeyDict()
-
 def save_malarkey(malarkey_dict, malarkey_file='malarky.pkl'):
     with open(malarkey_file, 'wb') as file:
         pickle.dump(malarkey_dict, file)
@@ -89,7 +82,7 @@ def strip_word(word):
             new_word.append(letter)
     return "".join(new_word)
 
-class MalarkeyDict:
+class MalarkyDict:
 
     def __init__(self):
         self._keys = list()
@@ -181,3 +174,10 @@ class MalarkeyDict:
                 malarkey_count += self.__getitem__(word)
                 groups_used.append(self._get_index(word))
         return malarkey_count
+
+def load_malarkey(malarkey_file='malarky.pkl'):
+    if path.exists(malarkey_file):
+        with open(malarkey_file, 'rb') as file:
+            return pickle.load(file)
+    else:
+        return MalarkyDict()
