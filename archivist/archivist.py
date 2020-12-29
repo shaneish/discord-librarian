@@ -3,7 +3,7 @@ from discord.ext import commands
 import asyncio
 import tldextract
 import requests
-from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip, MalarkeyDict, load_malarkey, save_malarkey
+from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip, MalarkyDict, load_malarkey, save_malarkey
 import random
 from datetime import datetime, timedelta
 import pickle
