@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 import pickle
+from os import path
 
 def columnize(l, cols=3):
     tracker = dict()
@@ -53,18 +54,21 @@ def load_paywalls(paywall_file='paywalled'):
         return [i for i in paywalled_sites if i != ""]
 
 # read TheLibrarians Discord token
-def load_token(token_file='./token'):
+def load_token(token_file='token'):
     with open(token_file, "r") as file:
         token = file.read()
         return token
 
-def load_malarky(malarkey_file='./malarky.pkl'):
-    with open(malarkey_file, 'rb') as file:
-        return pickle.load(file)
+def load_malarkey(malarkey_file='malarky.pkl'):
+    if path.exists(malarkey_file):
+        with open(malarkey_file, 'rb') as file:
+            return pickle.load(file)
+    else:
+        return MalarkeyDict()
 
-def save_malarky(malarky_dict, malarky_file='./malarky.pkl'):
-    with open(malarky_file, 'wb') as file:
-        pickle.dump(malarky_dict, file)
+def save_malarkey(malarkey_dict, malarkey_file='malarky.pkl'):
+    with open(malarkey_file, 'wb') as file:
+        pickle.dump(malarkey_dict, file)
 
 # quick way to identify 'and' word combinations
 def and_includes(message, *words):
@@ -85,7 +89,7 @@ def strip_word(word):
             new_word.append(letter)
     return "".join(new_word)
 
-class MalarkyDict:
+class MalarkeyDict:
 
     def __init__(self):
         self._keys = list()
@@ -134,7 +138,7 @@ class MalarkyDict:
         else:
             raise ValueError("Not found in current groups.")
     '''
-    
+
     def __len__(self):
         return len(self._keys)
     
@@ -168,7 +172,7 @@ class MalarkyDict:
     def __repr__(self):
         return self.__str__()
 
-    def measure_malarky(self, sentence):
+    def measure_malarkey(self, sentence):
         words = [strip_word(word) for word in sentence.replace("\n", "").replace("\t", "").replace("-", " ").replace("_", " ").split(" ")]
         groups_used = list()
         malarkey_count = 0

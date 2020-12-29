@@ -3,16 +3,17 @@ from discord.ext import commands
 import asyncio
 import tldextract
 import requests
-from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip, MalarkyDict, load_malarky, save_malarky
+from utils import cprint, url_validator, load_paywalls, load_token, and_includes, or_includes, strip, MalarkeyDict, load_malarkey, save_malarkey
 import random
 from datetime import datetime, timedelta
 import pickle
+import sys
 
 
 class Archivist(commands.Cog):
-    def __init__(self, paywalled_sites, malarky_dict):
+    def __init__(self, paywalled_sites, malarkey_dict):
         self.paywalled_sites = paywalled_sites
-        self.malarky_dict = malarky_dict
+        self.malarkey_dict = malarkey_dict
 
     @commands.command(name='paywalls')
     async def paywalls(self, ctx, *args):
@@ -48,19 +49,23 @@ class Archivist(commands.Cog):
         
     @commands.command(name="malarkey")
     async def malarkey(self, ctx, *args):
+        # implementation of the malarkey meter
         if (len(args) > 1) and (args[0].isdigit()):
+            # if first arg is a positive integer, create/update the group represented by the subsequent words
             words = set(args[1:])
             try:
-                self.malarky_dict[words] = int(args[0])
-                save_malarky(self.malarky_dict)
+                self.malarkey_dict[words] = int(args[0])
+                save_malarkey(self.malarkey_dict)
                 await ctx.send(f"New malarkey group {words} with value {int(args[0])} added!")
             except ValueError:
                 await ctx.send("Incompatible malarkey addition, stupid.")
         elif (len(args) == 0) or ((len(args) == 1) and (args[0] == "")):
+            # if just !malarkey by itself is called, calculate the malarkey meter for the last 30 mins and send a chat update
+            # with the current malarkey level
             malarkey_count = 0
             for message in await ctx.channel.history(limit=1000, after=ctx.message.created_at - timedelta(minutes=30)).flatten():
                 if message.content:
-                    malarkey_count += self.malarky_dict.measure_malarky(message.content)
+                    malarkey_count += self.malarkey_dict.measure_malarkey(message.content)
             if malarkey_count < 1:
                 await ctx.send("**No Malarkey detected.**")
             elif malarkey_count < 200:
@@ -76,21 +81,27 @@ class Archivist(commands.Cog):
             else:
                 await ctx.send("**:fire: :fire: GET OUTTA HERE, JACK! :fire: :fire:**")
         elif args[0] == "groups":
-            await ctx.send('```' + str(self.malarky_dict)[1:-1] + '```')
+            # if first arg is 'groups', list all of the group representations and their corresponding malarkey levels
+            await ctx.send('```' + str(self.malarkey_dict)[1:-1] + '```')
         elif args[0] == 'update':
+            # if the first arg is 'update', find the group representation of the second arg and 
+            # add all subsequent args to that group representation
             try:
-                self.malarky_dict._update_key(args[1:])
-                save_malarky(self.malarky_dict)
+                self.malarkey_dict._update_key(args[1:])
+                save_malarkey(self.malarkey_dict)
                 await ctx.send(f"Added {set(args[2:])} to {args[1]}'s group.")
             except ValueError:
                 await ctx.send("Incompatible group addition, dummy.")
+        # need to fix remove feature below.  Currently a catastrophic failure that removes entire MalarkeyDict
+        '''
         elif args[0] == "remove":
             try:
-                self.malarky_dict.remove_from_group(args[1])
-                save_malarky(self.malarky_dict)
+                self.malarkey_dict.remove_from_group(args[1])
+                save_malarkey(self.malarkey_dict)
                 await ctx.send(f"Removed {args[1]} from group.")
             except ValueError:
                 await ctx.send("Unable to remove from a group.")
+        '''
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -131,15 +142,15 @@ class RateLimiter(commands.Cog):
             elif len(human_author_set) == 1:
                 prefix = f"{list(human_author_set)[0].mention} is "
             if prefix:
-                if len(messages) > 100:
+                if len(messages) > 50:
                     await message.channel.send(prefix + "going at it. Wow!")
-                if len(messages) > 200:
+                if len(messages) > 100:
                     await message.channel.send(prefix + "getting into some serious behavior.")
-                if len(messages) > 300:
+                if len(messages) > 150:
                     await message.channel.send(prefix + "setting a record!")
-                if len(messages) > 400:
+                if len(messages) > 200:
                     await message.channel.send(prefix + "very serious about this!")
-                if len(messages) > 500:
+                if len(messages) > 250:
                     await message.channel.send(prefix + ", shut up. Please.")
 
 class Creeper(commands.Cog):
@@ -153,22 +164,22 @@ class Creeper(commands.Cog):
             # (note: not antisemitic joke, used to mock the antisemitic globalist Soros stories)
             await message.channel.send('No problemo buckaroo, anything for a fellow reptile.')
         
-        if and_includes(message.content, 'who', 'horrible'):
+        if and_includes(message.content, 'who', 'horrible') and (random.random() < 0.5):
             # You know what this does
             await message.channel.send(f"Why, {message.author.mention} of course!")
 
-        if or_includes(message.content, 'socialis', 'communis'):
+        if or_includes(message.content, 'socialis', 'communis') and (random.random() < 0.33):
             # You know what this does
             await message.channel.send(f"AJ is the real commie here!")
         
-        if or_includes(message.content, 'shane', 'metricity', 'the best')  and (message.author != self.bot.user):
+        if or_includes(message.content, 'shane', 'metricity', 'the best') and (message.author != self.bot.user) and (random.random() < 0.333):
             await message.channel.send(f"Shane really is the best.")
         
-        if or_includes(message.content, "suck", "sux") and (message.author != self.bot.user):
+        if or_includes(message.content, "suck", "sux") and (message.author != self.bot.user) and (random.random() < 0.333):
             # ya know what this does too
             await message.channel.send("You know what else sucks? Salex Bexman.")
         
-        if 'twitter' in message.content.lower():
+        if ('twitter' in message.content.lower()) and (random.random() < 0.25):
             if 'metricity' in message.author.name.lower():
                 await message.channel.send(f"Another well-researched Shaun King tweet, {message.author.mention}?")
             elif 'mudman' in message.author.name.lower():
@@ -241,8 +252,8 @@ if __name__ == "__main__":
     paywalled_sites = load_paywalls()
     # load bot token
     token = load_token()
-    # load malarkydict
-    malarky = load_malarky()
+    # load malarkeydict
+    malarkey = load_malarkey()
 
     '''bot instantiation'''
     # creates discord bot object (with member intents enabled to grab members)
@@ -250,7 +261,7 @@ if __name__ == "__main__":
     intents.members = True
     bot = commands.Bot(intents = intents, command_prefix = '!', case_insensitive = True)
     #add command cogs to bot
-    bot.add_cog(Archivist(paywalled_sites, malarky)) #archive is commands and listener 
+    bot.add_cog(Archivist(paywalled_sites, malarkey)) #archive is commands and listener 
     bot.add_cog(RateLimiter()) #gripe at sal and aj when they fight
     bot.add_cog(Utes()) #calc and gif
     bot.add_cog(Creeper(bot)) #listen to say weird things
