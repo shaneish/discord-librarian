@@ -116,6 +116,7 @@ class Archivist(commands.Cog):
 class RateLimiter(commands.Cog):
     def __init__(self):
         self.last_check_in = None
+        self.check_in_cooldown = timedelta(seconds = 60)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -123,13 +124,13 @@ class RateLimiter(commands.Cog):
         #TODO: Lower the checkin time delta based on the subsequent frequency
         if isinstance(message.channel, discord.channel.DMChannel) or isinstance(message.channel, discord.channel.GroupChannel):
             return
-        if not self.last_check_in or self.last_check_in < (message.created_at - timedelta(seconds = 60)):
+        if not self.last_check_in or self.last_check_in < (message.created_at - self.check_in_cooldown):
             #grab the non-bot members
             memb_ls=[m for m in message.channel.members if not m.bot]
             #grab the last ten minutes of messages, up to 600 messages
             self.last_check_in = message.created_at
-            ten_min_ago = message.created_at - timedelta(seconds = 600)
-            messages = await message.channel.history(limit = 600, after = ten_min_ago).flatten()
+            ten_min_before_last_checkin = message.created_at - timedelta(seconds = 600) - self.check_in_cooldown
+            messages = await message.channel.history(limit = 600, after = ten_min_before_last_checkin).flatten()
             #get the history of message authors who aren't bots
             human_authors_history = [m.author for m in messages if m.author in memb_ls] 
             #get the unique authors
@@ -142,17 +143,24 @@ class RateLimiter(commands.Cog):
             elif len(human_author_set) == 1:
                 prefix = f"{list(human_author_set)[0].mention} is "
             if prefix:
-                if len(messages) > 50:
-                    await message.channel.send(prefix + "going at it. Wow!")
-                if len(messages) > 100:
-                    await message.channel.send(prefix + "getting into some serious behavior.")
-                if len(messages) > 150:
-                    await message.channel.send(prefix + "setting a record!")
-                if len(messages) > 200:
-                    await message.channel.send(prefix + "very serious about this!")
-                if len(messages) > 250:
-                    await message.channel.send(prefix + ", shut up. Please.")
-
+                if 50 <= len(messages) :
+                    #throw message
+                    if 50 <= len(messages) < 100 :
+                        await message.channel.send(prefix + "going at it. Wow!")
+                    if 100 <= len(messages) < 150:
+                        await message.channel.send(prefix + "getting into some serious behavior.")
+                    if 150 <= len(messages) < 200:
+                        await message.channel.send(prefix + "setting a record!")
+                    if 200 <= len(messages) < 250:
+                        await message.channel.send(prefix + "very serious about this!")
+                    if 250 <= len(messages):
+                        await message.channel.send(prefix[:-4].rstrip() + ", shut up. Please.")
+                    #set new checkin cooldown
+                    cd_secs = self.check_in_cooldown.seconds
+                    self.check_in_cooldown = timedelta(seconds = cd_secs + random.randint(0, int(cd_secs/2)))
+                elif self.check_in_cooldown.seconds != 60:
+                    #reset cooldown
+                    self.check_in_cooldown = timedelta(seconds = 60)
 class Creeper(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
