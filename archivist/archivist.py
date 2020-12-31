@@ -50,58 +50,59 @@ class Archivist(commands.Cog):
     @commands.command(name="malarkey")
     async def malarkey(self, ctx, *args):
         # implementation of the malarkey meter
-        if (len(args) > 1) and (args[0].isdigit()):
-            # if first arg is a positive integer, create/update the group represented by the subsequent words
-            words = set(args[1:])
-            try:
-                self.malarkey_dict[words] = int(args[0])
-                save_malarkey(self.malarkey_dict)
-                await ctx.send(f"New malarkey group {words} with value {int(args[0])} added!")
-            except ValueError:
-                await ctx.send("Incompatible malarkey addition, stupid.")
-        elif (len(args) == 0) or ((len(args) == 1) and (args[0] == "")):
-            # if just !malarkey by itself is called, calculate the malarkey meter for the last 30 mins and send a chat update
-            # with the current malarkey level
-            malarkey_count = 0
-            for message in await ctx.channel.history(limit=1000, after=ctx.message.created_at - timedelta(minutes=30)).flatten():
-                if message.content:
-                    malarkey_count += self.malarkey_dict.measure_malarkey(message.content)
-            if malarkey_count < 1:
-                await ctx.send("**No Malarkey detected.**")
-            elif malarkey_count < 200:
-                await ctx.send("**Minimal Malarkey**")
-            elif malarkey_count < 400:
-                await ctx.send("**Potential Malarkey**")
-            elif malarkey_count < 600:
-                await ctx.send("**Significant Malarkey**")
-            elif malarkey_count < 800:
-                await ctx.send("**Extreme levels of Malarkey**")
-            elif malarkey_count < 1000:
-                await ctx.send("**:rotating_light: Malarkey Quarantine :rotating_light:**")
-            else:
-                await ctx.send("**:fire: :fire: GET OUTTA HERE, JACK! :fire: :fire:**")
-        elif args[0] == "groups":
-            # if first arg is 'groups', list all of the group representations and their corresponding malarkey levels
-            await ctx.send('```' + str(self.malarkey_dict)[1:-1] + '```')
-        elif args[0] == 'update':
-            # if the first arg is 'update', find the group representation of the second arg and 
-            # add all subsequent args to that group representation
-            try:
-                self.malarkey_dict._update_key(args[1:])
-                save_malarkey(self.malarkey_dict)
-                await ctx.send(f"Added {set(args[2:])} to {args[1]}'s group.")
-            except ValueError:
-                await ctx.send("Incompatible group addition, dummy.")
-        # need to fix remove feature below.  Currently a catastrophic failure that removes entire MalarkeyDict
-        '''
-        elif args[0] == "remove":
-            try:
-                self.malarkey_dict.remove_from_group(args[1])
-                save_malarkey(self.malarkey_dict)
-                await ctx.send(f"Removed {args[1]} from group.")
-            except ValueError:
-                await ctx.send("Unable to remove from a group.")
-        '''
+        if "sal" not in ctx.message.author.name.lower():
+            if (len(args) > 1) and (args[0].isdigit()):
+                # if first arg is a positive integer, create/update the group represented by the subsequent words
+                words = set(args[1:])
+                try:
+                    self.malarkey_dict[words] = int(args[0])
+                    save_malarkey(self.malarkey_dict)
+                    await ctx.send(f"New malarkey group {words} with value {int(args[0])} added!")
+                except ValueError:
+                    await ctx.send("Incompatible malarkey addition, stupid.")
+            elif (len(args) == 0) or ((len(args) == 1) and (args[0] == "")):
+                # if just !malarkey by itself is called, calculate the malarkey meter for the last 30 mins and send a chat update
+                # with the current malarkey level
+                malarkey_count = 0
+                for message in await ctx.channel.history(limit=1000, after=ctx.message.created_at - timedelta(minutes=30)).flatten():
+                    if message.content:
+                        malarkey_count += self.malarkey_dict.measure_malarkey(message.content)
+                if malarkey_count < 1:
+                    await ctx.send("**No Malarkey detected.**")
+                elif malarkey_count < 200:
+                    await ctx.send("**Minimal Malarkey**")
+                elif malarkey_count < 400:
+                    await ctx.send("**Potential Malarkey**")
+                elif malarkey_count < 600:
+                    await ctx.send("**Significant Malarkey**")
+                elif malarkey_count < 800:
+                    await ctx.send("**Extreme levels of Malarkey**")
+                elif malarkey_count < 1000:
+                    await ctx.send("**:rotating_light: Malarkey Quarantine :rotating_light:**")
+                else:
+                    await ctx.send("**:fire: :fire: GET OUTTA HERE, JACK! :fire: :fire:**")
+            elif args[0] == "groups":
+                # if first arg is 'groups', list all of the group representations and their corresponding malarkey levels
+                await ctx.send('```' + str(self.malarkey_dict)[1:-1] + '```')
+            elif args[0] == 'update':
+                # if the first arg is 'update', find the group representation of the second arg and 
+                # add all subsequent args to that group representation
+                try:
+                    self.malarkey_dict._update_key(args[1:])
+                    save_malarkey(self.malarkey_dict)
+                    await ctx.send(f"Added {set(args[2:])} to {args[1]}'s group.")
+                except ValueError:
+                    await ctx.send("Incompatible group addition, dummy.")
+            # need to fix remove feature below.  Currently a catastrophic failure that removes entire MalarkeyDict
+            '''
+            elif args[0] == "remove":
+                try:
+                    self.malarkey_dict.remove_from_group(args[1])
+                    save_malarkey(self.malarkey_dict)
+                    await ctx.send(f"Removed {args[1]} from group.")
+                except ValueError:
+                    await ctx.send("Unable to remove from a group.")
+            '''
 
     @commands.Cog.listener()
     async def on_message(self, message):
