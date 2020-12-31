@@ -50,7 +50,7 @@ class Archivist(commands.Cog):
     @commands.command(name="malarkey")
     async def malarkey(self, ctx, *args):
         # implementation of the malarkey meter
-        if "sal" not in ctx.message.author.name.lower():
+        if "dingbat" not in ctx.message.author.name.lower():
             if (len(args) > 1) and (args[0].isdigit()):
                 # if first arg is a positive integer, create/update the group represented by the subsequent words
                 words = set(args[1:])
