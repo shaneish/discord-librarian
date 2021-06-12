@@ -185,18 +185,6 @@ class Creeper(commands.Cog):
                 await message.channel.send(f"Another well-researched Shaun King tweet, {message.author.mention}?")
             elif 'mudman' in message.author.name.lower():
                 await message.channel.send(f"Inta Hmar, {message.author.mention}.")
-        
-        if 'mister4c3' in message.author.name.lower():
-            if 'shitlord' in message.content.lower():
-                await message.channel.send(f"{message.author.mention} Here comes AJ the baitlord again...")
-            elif 'asshole' in message.content.lower():
-                await message.channel.send(f"{message.author.mention} The real asshole here is you for baiting" \
-                    "arguments even though you know being an anti-vaxxer is problematic...")
-            elif 'parent' in message.content.lower():
-                await message.channel.send("FYI AJ's parents are anti-vaxxers")
-            elif 'vaccin' or 'vax' in message.content.lower() and (random.random() < 0.50):
-                await message.channel.send("It sure is good that vaccines have made it so that MAGAt anti-vaxxers are" \
-                    "only putting themselves at risk now.")
 
     @commands.command()
     async def test(self,ctx):
