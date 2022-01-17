@@ -8,6 +8,84 @@ import random
 from datetime import datetime, timedelta
 import pickle
 import sys
+import csv
+import os
+import re
+import matplotlib.pyplot as plt
+from statistics import median, stdev
+
+
+class Wordle(commands.Cog):
+
+    def __init__(self, bot):
+        self.client = bot
+
+    @commands.command(name='score')
+    async def score(self, message, *args):
+        if len(args) > 0:
+            if args[0].isdigit():
+                wordle_str = f"Wordle {args[0]} (\d*X*)/6"
+                user_name = None
+            else:
+                wordle_str = f"Wordle [0-9]+ (\d*X*)/6"
+                user_name = args[0]
+        else:
+            wordle_str = f"Wordle [0-9]+ (\d*X*)/6"
+            user_name = None
+        collected_scores = list()
+        async for msg in message.channel.history(limit=None):
+            wordle_score = re.findall(wordle_str, msg.content)
+            if len(wordle_score) > 0:
+                n_score = 7 if ("X" in wordle_score[0]) else int(wordle_score[0])
+                collected_scores.append(n_score)
+        if len(collected_scores) > 0:
+            plt.hist(collected_scores, bins=[1, 2, 3, 4, 5, 6, 7])
+            plt.savefig("recent_wordle_plot.png")
+            plt.clf()
+            stats_msg = f"**Mean:** {sum(collected_scores)/len(collected_scores)}\n**Median:** {median(collected_scores)}\n**Std:** {stdev(collected_scores)}"
+            await message.channel.send(stats_msg, file=discord.File("recent_wordle_plot.png"))
+        else:
+            await message.channel.send("No wordles found.")
+
+
+class Collector(commands.Cog):
+
+    def __init__(self, bot):
+        self.client = bot
+
+    @commands.command(name="collect")
+    async def collect(self, message, *args):
+        num_messages = None
+        if len(args) > 0:
+            if args[0].isdigit():
+                num_messages = int(args[0])
+        with open(f"./data/{message.channel}.csv", 'w') as data_file:
+            writer = csv.DictWriter(data_file, fieldnames=["Message", "Time", "Author", "Channel"])
+            writer.writeheader()
+            async for msg in message.channel.history(limit=num_messages):
+                writer.writerow({'Message': msg.content, 'Time': msg.created_at, 'Author': msg.author.name, 'Channel': message.channel})
+        await message.channel.send(file=discord.File(f"./data/{message.channel}.csv"))
+        os.remove(f"./data/{message.channel}.csv")
+    
+    @commands.command(name="collect_all")
+    async def collect_all(self, ctx, *args):
+        num_messages = None
+        if len(args) > 0:
+            if args[0].isdigit():
+                num_messages = int(args[0])
+        total_channels = len(ctx.guild.text_channels)
+        with open("./data/temp.csv", "w") as data:
+            writer = csv.DictWriter(data, fieldnames=["Message", "Time", "Author", "Channel"])
+            writer.writeheader()
+            scrape_pct = await ctx.send("Scraping complete: 0.00%")
+            for index, channel in enumerate(ctx.guild.text_channels):
+                try:
+                    async for msg in channel.history(limit=num_messages):
+                        writer.writerow({'Message': msg.content, 'Time': msg.created_at, 'Author': msg.author.name, 'Channel': msg.channel})
+                except:
+                    pass
+                await scrape_pct.edit(content=f"Scraping complete: {round((index+1)*100/total_channels, 2)}%")
+        os.rename("./data/temp.csv", "./data/server_messages.csv")
 
 
 class Archivist(commands.Cog):
@@ -266,5 +344,7 @@ if __name__ == "__main__":
     bot.add_cog(RateLimiter()) #gripe at sal and aj when they fight
     bot.add_cog(Utes()) #calc and gif
     bot.add_cog(Creeper(bot)) #listen to say weird things
+    bot.add_cog(Wordle(bot))
+    bot.add_cog(Collector(bot))
     #run the bot
     bot.run(token)
