@@ -8,6 +8,9 @@ import sys
 
 
 class Creeper(commands.Cog):
+    """
+    Creeper just peeps messages and responds with group in-jokes
+    """
     def __init__(self, bot):
         self.bot = bot
 
@@ -48,6 +51,7 @@ class Utes(commands.Cog):
 
     @commands.command()
     async def gif(self, ctx, *args):
+        # returns random gifs
         scope, args = (int(args[0]), args[1:]) if args[0].isdigit() else (1, args)
         num_gifs, args = (scope, args[1:]) if args[0] == 'melee' else (1, args)
         search = "+".join(args)
