@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 import pickle
 from os import path
+import pathlib
 
 
 def columnize(l, cols=3):
@@ -52,10 +53,11 @@ def url_validator(x):
 
 # read the paywalled config file to read all websites currently redirected by TheLibrarian
 def load_paywalls(paywall_file='paywalled'):
-    if path.exist(paywall_file):
-        file_to_read = paywall_file
+    print("Loading paywalled sites...")
+    if path.exists(pathlib.Path(__file__).parent / "resources" / paywall_file):
+        file_to_read = pathlib.Path(__file__).parent / paywall_file
     else:
-        file_to_read = "base_paywalls"
+        file_to_read = pathlib.Path(__file__).parent / "resources" / "base_paywalls"
     with open(file_to_read, 'r') as file:
         paywalled_sites = file.read().split("\n")
         return [i for i in paywalled_sites if i != ""]
@@ -63,7 +65,8 @@ def load_paywalls(paywall_file='paywalled'):
 
 # read TheLibrarians Discord token
 def load_token(token_file='token'):
-    with open(token_file, "r") as file:
+    print("Loading token...")
+    with open(pathlib.Path(__file__).parent / "resources" / token_file, "r") as file:
         token = file.read()
         return token
 
