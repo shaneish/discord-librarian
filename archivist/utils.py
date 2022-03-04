@@ -16,7 +16,7 @@ def columnize(l, cols=3):
 
 
 def cprint(string_list, cols=2, sep="  "):
-    '''
+    """
     Function to print long lists more compactly.
     Uncomment the comments to have it print perfect columns in terminal.
     Unfortunately doesn't translate to Discord.
@@ -24,9 +24,9 @@ def cprint(string_list, cols=2, sep="  "):
     ::string_list [List[Str]]:: list of strings
     ::cols [Int]:: number of columns to break up
     ::spaces [Int]:: number of spaces to add between words
-    
+
     Returns: [Str]
-    '''
+    """
     max_length = columnize(string_list, cols=cols)
     s = f"```{str(string_list[0]).ljust(max_length[0])}"
     for ndx, site in enumerate(string_list[1:]):
@@ -39,11 +39,11 @@ def cprint(string_list, cols=2, sep="  "):
 
 
 def url_validator(x):
-    '''
+    """
     Quick function to validate if 'x' is a proper URL or not
 
     Returns: Boolean
-    '''
+    """
     try:
         result = urlparse(x)
         return all([result.scheme, result.netloc, result.path])
@@ -52,19 +52,19 @@ def url_validator(x):
 
 
 # read the paywalled config file to read all websites currently redirected by TheLibrarian
-def load_paywalls(paywall_file='paywalled'):
+def load_paywalls(paywall_file="paywalled"):
     print("Loading paywalled sites...")
     if path.exists(pathlib.Path(__file__).parent / "resources" / paywall_file):
         file_to_read = pathlib.Path(__file__).parent / paywall_file
     else:
         file_to_read = pathlib.Path(__file__).parent / "resources" / "base_paywalls"
-    with open(file_to_read, 'r') as file:
+    with open(file_to_read, "r") as file:
         paywalled_sites = file.read().split("\n")
         return [i for i in paywalled_sites if i != ""]
 
 
 # read TheLibrarians Discord token
-def load_token(token_file='token'):
+def load_token(token_file="token"):
     print("Loading token...")
     with open(pathlib.Path(__file__).parent / "resources" / token_file, "r") as file:
         token = file.read()
@@ -83,7 +83,9 @@ def or_includes(message, *words):
 
 # strip punctuation from a string
 def strip(s):
-    return "".join([char for char in s if char not in '~`!@#$%^&*()-_+=[]{};:"\'<>,./?'])
+    return "".join(
+        [char for char in s if char not in "~`!@#$%^&*()-_+=[]{};:\"'<>,./?"]
+    )
 
 
 def strip_word(word):

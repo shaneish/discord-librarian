@@ -8,31 +8,39 @@ class Librarian(commands.Cog):
     def __init__(self, paywalled_sites):
         self.paywalled_sites = paywalled_sites
 
-    @commands.command(name='paywalls')
+    @commands.command(name="paywalls")
     async def paywalls(self, ctx, *args):
-        if args[0] == 'add':
+        if args[0] == "add":
             # Add new domains to list of paywalled domains
             # Format: `!paywalls add DOMAIN_1 DOMAIN_2 ... DOMAIN_n` will add DOMAIN_1 thru DOMAIN_n to list
             #     of paywalled sites and respond with a confirmation message.
             self.paywalled_sites = list(set(self.paywalled_sites).union(set(args[1:])))
-            with open('paywalled', 'w') as file:
+            with open("paywalled", "w") as file:
                 sites = "\n".join(self.paywalled_sites)
                 file.write(sites)
-                await ctx.send('**Added the following domains:**' + "\n" + cprint(args[1:]))
-        elif args[0] == 'list':
+                await ctx.send(
+                    "**Added the following domains:**" + "\n" + cprint(args[1:])
+                )
+        elif args[0] == "list":
             # List all paywalled sites currently tracking
             # Format: `!paywalls list` will list all paywalled sites
-            await ctx.send("**Paywalled sites:**" + "\n" + cprint(sorted(self.paywalled_sites)))
-        elif args[0] == 'delete':
+            await ctx.send(
+                "**Paywalled sites:**" + "\n" + cprint(sorted(self.paywalled_sites))
+            )
+        elif args[0] == "delete":
             # Delete domains to list of paywalled domains
             # Format: `!paywalls delete DOMAIN_1 DOMAIN_2 ... DOMAIN_n` will add DOMAIN_1 thru DOMAIN_n to list
             #     of paywalled sites and respond with a confirmation message.
-            self.paywalled_sites = list(set(self.paywalled_sites).difference(set(args[1:])))
-            with open('paywalled', 'w') as file:
+            self.paywalled_sites = list(
+                set(self.paywalled_sites).difference(set(args[1:]))
+            )
+            with open("paywalled", "w") as file:
                 sites = "\n".join(self.paywalled_sites)
                 file.write(sites)
-                await ctx.send('**Deleted the following domains:**' + "\n" + cprint(args[1:]))
-        elif args[0] == 'link':
+                await ctx.send(
+                    "**Deleted the following domains:**" + "\n" + cprint(args[1:])
+                )
+        elif args[0] == "link":
             # Manually link to archive.is
             # Format: `!paywalls link URL` will link to archive.is/URL
             if url_validator([args[1]]):
